@@ -125,3 +125,40 @@ exports.updateAd = async (req, res) => {
     });
   }
 };
+
+// =======================
+// Delete Advertisement
+// =======================
+exports.deleteAd = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const ad = await Ad.findById(id);
+
+    if (!ad) {
+      return res.status(404).json({
+        success: false,
+        message: "Advertisement not found.",
+      });
+    }
+
+    if (ad.business.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized.",
+      });
+    }
+
+    await Ad.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+      message: "Advertisement deleted successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
