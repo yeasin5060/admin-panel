@@ -1,31 +1,15 @@
 import cloudinary from "../config/cloudinary.js";
 import { Ad } from "../models/ad.model.js";
+import fs from 'fs'
 
 // =======================
 // Create Advertisement
 // =======================
 export const createAd = async (req, res) => {
   try {
-    const {
-      title,
-      description,
-      mediaType,
-      ctaText,
-      websiteUrl,
-      adType,
-      videoPosition,
-      startDate,
-      endDate,
-    } = req.body;
+    const {title, description, mediaType, ctaText, websiteUrl, adType, videoPosition, startDate, endDate} = req.body;
 
-    if (
-      !title ||
-      !mediaType ||
-      !websiteUrl ||
-      !adType ||
-      !startDate ||
-      !endDate
-    ) {
+    if (!title || !mediaType || !websiteUrl || !adType || !startDate || !endDate) {
       return res.status(400).json({
         success: false,
         message: "Please fill all required fields.",
@@ -66,6 +50,75 @@ export const createAd = async (req, res) => {
       ad,
     });
   } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// =======================
+// Update Advertisement
+// =======================
+
+exports.updateAd = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const ad = await Ad.findById(id);
+
+    if (!ad) {
+      return res.status(404).json({
+        success: false,
+        message: "Advertisement not found.",
+      });
+    }
+
+    // Only Owner Can Update
+    if (ad.business.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized.",
+      });
+    }
+
+    const updateData = { ...req.body };
+
+    // If New Media Uploaded
+    if (req.file) {
+      // Delete Old Media From Cloudinary
+      if (ad.public_id) {
+        await cloudinary.uploader.destroy(ad.public_id, {
+          resource_type: "auto",
+        });
+      }
+
+      // Upload New Media
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "advertisements",
+        resource_type: "auto",
+      });
+
+      updateData.mediaUrl = result.secure_url;
+      updateData.public_id = result.public_id;
+
+      // Delete Local File
+      fs.unlinkSync(req.file.path);
+    }
+
+    const updatedAd = await Ad.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Advertisement updated successfully.",
+      ad: updatedAd,
+    });
+  } catch (error) {
+    console.error(error);
+
     res.status(500).json({
       success: false,
       message: error.message,
