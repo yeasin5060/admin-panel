@@ -61,7 +61,7 @@ export const createAd = async (req, res) => {
 // Update Advertisement
 // =======================
 
-exports.updateAd = async (req, res) => {
+export const updateAd = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -129,7 +129,7 @@ exports.updateAd = async (req, res) => {
 // =======================
 // Delete Advertisement
 // =======================
-exports.deleteAd = async (req, res) => {
+export const deleteAd = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -154,6 +154,28 @@ exports.deleteAd = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Advertisement deleted successfully.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// =======================
+// Get My Advertisements
+// =======================
+export const getMyAds = async (req, res) => {
+  try {
+    const ads = await Ad.find({
+      business: req.user._id,
+    }).sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      total: ads.length,
+      ads,
     });
   } catch (error) {
     res.status(500).json({
