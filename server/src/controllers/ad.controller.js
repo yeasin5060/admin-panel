@@ -184,3 +184,26 @@ export const getMyAds = async (req, res) => {
     });
   }
 };
+
+
+// =======================
+// Get All Advertisements
+// =======================
+export const getAllAds = async (req, res) => {
+  try {
+    const ads = await Ad.find()
+      .populate("business", "name email companyName")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      total: ads.length,
+      ads,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
