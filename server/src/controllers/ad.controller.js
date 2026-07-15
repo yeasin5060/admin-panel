@@ -298,3 +298,38 @@ export const rejectAd = async (req, res) => {
     });
   }
 };
+
+// =======================
+//  Get Feed Advertisements
+// =======================
+
+export const getFeedAd = async (req, res) => {
+  try {
+    const today = new Date();
+
+    const ad = await Ad.findOne({
+      adType: "FEED",
+      status: "APPROVED",
+      isActive: true,
+      startDate: { $lte: today },
+      endDate: { $gte: today },
+    }).sort({ createdAt: -1 });
+
+    if (!ad) {
+      return res.status(404).json({
+        success: false,
+        message: "No feed advertisement available.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      ad,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
