@@ -333,3 +333,41 @@ export const getFeedAd = async (req, res) => {
     });
   }
 };
+
+// =======================
+//  Get video Advertisements
+// =======================
+
+export const getVideoAd = async (req, res) => {
+  try {
+    const { position } = req.query;
+
+    const today = new Date();
+
+    const ad = await Ad.findOne({
+      adType: "VIDEO",
+      videoPosition: position,
+      status: "APPROVED",
+      isActive: true,
+      startDate: { $lte: today },
+      endDate: { $gte: today },
+    }).sort({ createdAt: -1 });
+
+    if (!ad) {
+      return res.status(404).json({
+        success: false,
+        message: "No video advertisement found.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      ad,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
