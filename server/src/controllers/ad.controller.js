@@ -238,7 +238,7 @@ export const getSingleAd = async (req, res) => {
 };
 
 // =======================
-// Get approve Advertisements
+//  approve Advertisements
 // =======================
 
 export const approveAd = async (req, res) => {
@@ -258,6 +258,37 @@ export const approveAd = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Advertisement approved successfully.",
+      ad,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// =======================
+//  reject Advertisements
+// =======================
+
+export const rejectAd = async (req, res) => {
+  try {
+    const ad = await Ad.findById(req.params.id);
+
+    if (!ad) {
+      return res.status(404).json({
+        success: false,
+        message: "Advertisement not found.",
+      });
+    }
+
+    ad.status = "REJECTED";
+    await ad.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Advertisement rejected successfully.",
       ad,
     });
   } catch (error) {
