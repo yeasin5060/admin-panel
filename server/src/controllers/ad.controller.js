@@ -207,3 +207,32 @@ export const getAllAds = async (req, res) => {
     });
   }
 };
+
+// =======================
+// Get single Advertisements
+// =======================
+export const getSingleAd = async (req, res) => {
+  try {
+    const ad = await Ad.findById(req.params.id).populate(
+      "business",
+      "name email companyName"
+    );
+
+    if (!ad) {
+      return res.status(404).json({
+        success: false,
+        message: "Advertisement not found.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      ad,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
