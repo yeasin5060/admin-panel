@@ -371,3 +371,30 @@ export const getVideoAd = async (req, res) => {
     });
   }
 };
+
+export const recordImpression = async (req, res) => {
+  try {
+    const { adId } = req.params;
+
+    await AdView.create({
+      ad: adId,
+      user: req.user?._id || null,
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+    });
+
+    await Ad.findByIdAndUpdate(adId, {
+      $inc: { impressions: 1 },
+    });
+
+    res.json({
+      success: true,
+      message: "Impression recorded.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
