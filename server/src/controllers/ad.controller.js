@@ -1,5 +1,6 @@
 import cloudinary from "../config/cloudinary.js";
 import { Ad } from "../models/ad.model.js";
+import AdClick from "../models/AdClick.js";
 import fs from 'fs'
 
 // =======================
@@ -398,3 +399,31 @@ export const recordImpression = async (req, res) => {
     });
   }
 }
+
+
+export const recordClick = async (req, res) => {
+  try {
+    const { adId } = req.params;
+
+    await AdClick.create({
+      ad: adId,
+      user: req.user?._id || null,
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+    });
+
+    await Ad.findByIdAndUpdate(adId, {
+      $inc: { clicks: 1 },
+    });
+
+    res.json({
+      success: true,
+      message: "Click recorded.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
