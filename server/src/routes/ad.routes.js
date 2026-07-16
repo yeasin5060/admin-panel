@@ -1,36 +1,96 @@
 import express from "express";
+
+import {
+  createAd,
+  updateAd,
+  deleteAd,
+  getMyAds,
+  getFeedAd,
+  getVideoAd,
+  recordImpression,
+  recordClick,
+  recordVideoComplete,
+} from "../controllers/ad.controller.js";
+
 import auth from "../middlewares/auth.middleware.js";
 import isBusiness from "../middlewares/isBusiness.middleware.js";
-import { upload } from "../multer/mutler.js";
-import { approveAd, createAd, deleteAd, getAllAds, getFeedAd, getMyAds, getSingleAd, getVideoAd, rejectAd, updateAd } from "../controllers/ad.controller.js";
-import isAdmin from "../middlewares/isAdmin.middleware.js";
+import upload from "../middlewares/multer.middleware.js";
 
 const router = express.Router();
 
+/* ==========================================================
+   Business Routes
+========================================================== */
+
 // Create Advertisement
-router.post("/create", auth, isBusiness, upload.single("media"), createAd);
+router.post(
+  "/create",
+  auth,
+  isBusiness,
+  upload.single("media"),
+  createAd
+);
 
 // Get My Advertisements
-router.get("/my-ads", auth, isBusiness, getMyAds);
+router.get("/my-ads",auth,isBusiness,getMyAds);
 
 // Update Advertisement
-router.put("/update/:id", auth, isBusiness, upload.single("media"), updateAd);
+router.put(
+  "/update/:id",
+  auth,
+  isBusiness,
+  upload.single("media"),
+  updateAd
+);
 
 // Delete Advertisement
-router.delete("/delete/:id",auth, isBusiness, deleteAd);
+router.delete(
+  "/delete/:id",
+  auth,
+  isBusiness,
+  deleteAd
+);
 
-// Admin
-router.get("/all", auth, isAdmin, getAllAds);
+/* ==========================================================
+   Public Advertisement Routes
+========================================================== */
 
-router.get("/:id", auth, getSingleAd);
+// Get Feed Advertisement
+router.get(
+  "/feed",
+  getFeedAd
+);
 
-router.patch("/:id/approve", auth, isAdmin, approveAd);
+// Get Video Advertisement
+// Example:
+// /api/ads/video?position=BEFORE
+// /api/ads/video?position=MIDDLE
+// /api/ads/video?position=AFTER
+router.get(
+  "/video",
+  getVideoAd
+);
 
-router.patch("/:id/reject", auth, isAdmin, rejectAd);
+/* ==========================================================
+   Tracking Routes
+========================================================== */
 
-// Public
-router.get("/feed/ad", getFeedAd);
+// Record Impression
+router.post(
+  "/:adId/impression",
+  recordImpression
+);
 
-router.get("/video/ad", getVideoAd);
+// Record Click
+router.post(
+  "/:adId/click",
+  recordClick
+);
+
+// Record Video Complete
+router.post(
+  "/:adId/video-complete",
+  recordVideoComplete
+);
 
 export default router;

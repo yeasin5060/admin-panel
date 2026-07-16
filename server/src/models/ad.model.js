@@ -7,6 +7,7 @@ const adSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
 
     // Basic Information
@@ -18,6 +19,7 @@ const adSchema = new mongoose.Schema(
 
     description: {
       type: String,
+      default: "",
       trim: true,
     },
 
@@ -29,6 +31,12 @@ const adSchema = new mongoose.Schema(
     },
 
     mediaUrl: {
+      type: String,
+      required: true,
+    },
+
+    // Cloudinary Public ID
+    publicId: {
       type: String,
       required: true,
     },
@@ -56,13 +64,15 @@ const adSchema = new mongoose.Schema(
       required: true,
     },
 
-    // Ad Placement
+    // Feed / Video
     adType: {
       type: String,
       enum: ["FEED", "VIDEO"],
       required: true,
+      index: true,
     },
 
+    // Before / Middle / After
     videoPosition: {
       type: String,
       enum: ["BEFORE", "MIDDLE", "AFTER"],
@@ -80,14 +90,15 @@ const adSchema = new mongoose.Schema(
       required: true,
     },
 
-    // Approval Status
+    // Status
     status: {
       type: String,
       enum: ["PENDING", "APPROVED", "REJECTED"],
       default: "PENDING",
+      index: true,
     },
 
-    // Active / Disable
+    // Admin Enable / Disable
     isActive: {
       type: Boolean,
       default: true,
@@ -119,9 +130,11 @@ const adSchema = new mongoose.Schema(
   }
 );
 
-// Index for faster queries
-adSchema.index({ status: 1 });
-adSchema.index({ business: 1 });
-adSchema.index({ adType: 1 });
+// Compound Index
+adSchema.index({
+  status: 1,
+  adType: 1,
+  isActive: 1,
+});
 
 export const Ad = mongoose.model("Ad", adSchema);

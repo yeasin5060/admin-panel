@@ -4,6 +4,8 @@ import cors from 'cors'
 import connectDB from './src/db/db.js';
 import authRouter from './src/routes/user.route.js'
 import adRouter from './src/routes/ad.routes.js'
+import adminRouter from './src/routes/admin.route.js'
+import analyticsRouter from './src/routes/analytics.routes.js'
 
 dotenv.config();
 
@@ -17,6 +19,8 @@ app.use(cors());
 
 app.use('/api/auth', authRouter);
 app.use('/api/ad', adRouter);
+app.use('/api/admin', adminRouter);
+app.use('/api/analytics', analyticsRouter);
 
 
 
