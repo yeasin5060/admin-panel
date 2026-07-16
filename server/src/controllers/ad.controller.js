@@ -457,3 +457,32 @@ export const recordVideoComplete = async (req, res) => {
     });
   }
 };
+
+export const businessAnalytics = async (req, res) => {
+  try {
+    const businessId = req.user._id;
+
+    const ads = await Ad.find({ business: businessId });
+
+    const analytics = {
+      totalAds: ads.length,
+      totalImpressions: ads.reduce((a, b) => a + b.impressions, 0),
+      totalClicks: ads.reduce((a, b) => a + b.clicks, 0),
+      totalVideoSkips: ads.reduce((a, b) => a + b.videoSkips, 0),
+      totalVideoCompletes: ads.reduce(
+        (a, b) => a + b.videoCompletes,
+        0
+      ),
+    };
+
+    res.json({
+      success: true,
+      analytics,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
