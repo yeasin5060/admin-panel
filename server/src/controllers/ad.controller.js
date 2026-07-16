@@ -427,3 +427,33 @@ export const recordClick = async (req, res) => {
     });
   }
 };
+
+export const recordVideoComplete = async (req, res) => {
+  try {
+    const { adId } = req.params;
+
+    await AdEvent.create({
+      ad: adId,
+      user: req.user?._id || null,
+      event: "VIDEO_COMPLETE",
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+    });
+
+    await Ad.findByIdAndUpdate(adId, {
+      $inc: {
+        videoCompletes: 1,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Video complete recorded.",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
