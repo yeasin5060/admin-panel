@@ -14,7 +14,7 @@ import {
 
 import auth from "../middlewares/auth.middleware.js";
 import isBusiness from "../middlewares/isBusiness.middleware.js";
-import upload from "../middlewares/multer.middleware.js";
+import { upload } from "../multer/mutler.js";
 
 const router = express.Router();
 

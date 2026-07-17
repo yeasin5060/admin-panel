@@ -1,4 +1,4 @@
-import Ad from "../models/Ad.js";
+import { Ad } from "../models/ad.model.js";
 
 // ======================================
 // Business Analytics

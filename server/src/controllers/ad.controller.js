@@ -1,7 +1,8 @@
 import cloudinary from "../config/cloudinary.js";
 import { Ad } from "../models/ad.model.js";
-import AdClick from "../models/AdClick.js";
+import { AdClick } from "../models/adClick.model.js";
 import fs from 'fs'
+import { AdSetting } from "../models/adSetting.model.js";
 
 // =======================
 // Create Advertisement
@@ -229,18 +230,25 @@ export const getFeedAd = async (req, res) => {
 
 export const getVideoAd = async (req, res) => {
   try {
-    const { position } = req.query;
+    const settings = await AdSetting.findOne();
+
+    if (!settings || !settings.adEnabled) {
+      return res.status(404).json({
+        success: false,
+        message: "Advertisements are disabled.",
+      });
+    }
 
     const today = new Date();
 
     const ad = await Ad.findOne({
       adType: "VIDEO",
-      videoPosition: position,
       status: "APPROVED",
       isActive: true,
+      videoPosition: settings.videoPosition,
       startDate: { $lte: today },
       endDate: { $gte: today },
-    }).sort({ createdAt: -1 });
+    });
 
     if (!ad) {
       return res.status(404).json({
@@ -251,6 +259,9 @@ export const getVideoAd = async (req, res) => {
 
     res.status(200).json({
       success: true,
+      videoDelay: settings.videoDelay,
+      skipButtonDelay: settings.skipButtonDelay,
+      position: settings.videoPosition,
       ad,
     });
   } catch (error) {
@@ -260,7 +271,6 @@ export const getVideoAd = async (req, res) => {
     });
   }
 };
-
 export const recordImpression = async (req, res) => {
   try {
     const { adId } = req.params;
