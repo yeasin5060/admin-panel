@@ -3,10 +3,7 @@ import express from "express";
 import auth from "../middlewares/auth.middleware.js";
 import isAdmin from "../middlewares/isAdmin.middleware.js";
 
-import {
-  getSettings,
-  updateSettings,
-} from "../controllers/adSetting.controller.js";
+import {getSettings, updateSettings,} from "../controllers/adSetting.controller.js";
 
 const router = express.Router();
 

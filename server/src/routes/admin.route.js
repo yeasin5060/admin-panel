@@ -3,15 +3,7 @@ import express from "express";
 import auth from "../middlewares/auth.middleware.js";
 import isAdmin from "../middlewares/isAdmin.middleware.js";
 
-import {
-  dashboard,
-  getPendingAds,
-  getApprovedAds,
-  getRejectedAds,
-  approveAd,
-  rejectAd,
-  deleteAd,
-} from "../controllers/admin.controller.js";
+import { dashboard, getPendingAds, getApprovedAds, getRejectedAds, approveAd, rejectAd, deleteAd} from "../controllers/admin.controller.js";
 
 const router = express.Router();
 

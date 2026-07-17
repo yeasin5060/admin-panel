@@ -192,9 +192,17 @@ export const getMyAds = async (req, res) => {
 // =======================
 //  Get Feed Advertisements
 // =======================
-
 export const getFeedAd = async (req, res) => {
   try {
+    const settings = await AdSetting.findOne();
+
+    if (!settings || !settings.adEnabled) {
+      return res.status(404).json({
+        success: false,
+        message: "Advertisements are disabled.",
+      });
+    }
+
     const today = new Date();
 
     const ad = await Ad.findOne({
@@ -203,17 +211,18 @@ export const getFeedAd = async (req, res) => {
       isActive: true,
       startDate: { $lte: today },
       endDate: { $gte: today },
-    }).sort({ createdAt: -1 });
+    });
 
     if (!ad) {
       return res.status(404).json({
         success: false,
-        message: "No feed advertisement available.",
+        message: "No feed ad found.",
       });
     }
 
     res.status(200).json({
       success: true,
+      feedInterval: settings.feedAdInterval,
       ad,
     });
   } catch (error) {
